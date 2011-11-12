@@ -1,0 +1,11 @@
+Unofficial Face.com API.
+
+Important!
+The word "namespace" of the REST API is reserved in AS3 and there is everywhere in this library as the "names".
+
+AS3 examples:
+Read *.as files from directory src/examples/.
+
+
+Full REST API documentation:
+http://developers.face.com/docs/api/.
