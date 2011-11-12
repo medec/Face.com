@@ -1,22 +1,11 @@
 package facecom.api.model.results {
-	import facecom.api.model.core.Photo;
-	import facecom.api.model.core.Usage;
+
 	/**
 	 * @author medec
 	 */
-	public class FacesRecognizeResult extends Result {
-		
-		public var photos:Vector.<Photo> = new Vector.<Photo>();
-		
-		public var usage : Usage;
-
+	public class FacesRecognizeResult extends FacesDetectResult {
 		public function FacesRecognizeResult(data : Object) {
-			
 			super(data);
-
-			Result.arrayToVector(data['photos'], photos, Photo);
-		
-			usage = new Usage(data['usage']);
 		}
 	}
 }

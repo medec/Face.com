@@ -1,4 +1,5 @@
 package facecom.api.proxy {
+	import facecom.api.model.results.FacesDetectResult;
 	import facecom.api.FaceAPI;
 	import facecom.api.events.FaceAPIEvent;
 	import facecom.api.facecom;
@@ -23,7 +24,32 @@ package facecom.api.proxy {
 			super(clientAPI);
 		}
 		
-		public function recognize(photoURLs:Array = null, photo : BitmapData = null, uids:Array = null, names:String = '', detector:String = 'Aggressive', attributes:String = 'all') : void {
+		public function detect(photoURLs:Array = null, photo : BitmapData = null,detector:String = 'Aggressive', attributes:String = 'all', callback_url:String = null):void {
+			var ml : MultipartURLLoader = clientAPI.createLoader();
+
+			ml.addEventListener(Event.COMPLETE, detectCompleteHandler);
+			ml.addEventListener(IOErrorEvent.IO_ERROR, clientAPI.faceIOErrorHandler);
+			if(photoURLs) {
+				ml.addVariable('urls', photoURLs.join(','));
+			}
+			else if(photo) {
+				var photoFile : ByteArray = clientAPI.jpgEncoder.encode(photo);
+				ml.addFile(photoFile, 'image.jpg');
+			}
+			
+			ml.addVariable('detector', detector);
+			ml.addVariable('attributes', attributes);
+
+			ml.load(FaceAPI.API_DOMAIN + 'faces/detect.json');
+		}
+
+		private function detectCompleteHandler(event : Event) : void {
+			var result : FacesDetectResult = new FacesDetectResult(clientAPI.getResultDataToObject(event.currentTarget as MultipartURLLoader));
+			
+			clientAPI.dispatchEvent(new FaceAPIEvent(FaceAPIEvent.FACES_DETECT, result));
+		}
+		
+		public function recognize(photoURLs:Array = null, photo : BitmapData = null, uids:Array = null, names:String = '', detector:String = 'Aggressive', attributes:String = 'all', callback_url:String = null) : void {
 			var ml : MultipartURLLoader = clientAPI.createLoader();
 
 			ml.addEventListener(Event.COMPLETE, recognizeCompleteHandler);
@@ -33,7 +59,7 @@ package facecom.api.proxy {
 			}
 			else if(photo) {
 				var photoFile : ByteArray = clientAPI.jpgEncoder.encode(photo);
-				ml.addFile(photoFile, 'screenshot.jpg');
+				ml.addFile(photoFile, 'image.jpg');
 			}
 			
 			ml.addVariable('uids', uids.join(','));
