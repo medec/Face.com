@@ -1,5 +1,4 @@
 package facecom.api {
-	import facecom.api.events.FaceAPIEvent;
 	import facecom.api.events.FaceStatusEvent;
 	import facecom.api.model.core.Tag;
 	import facecom.api.model.results.FacesRecognizeResult;
