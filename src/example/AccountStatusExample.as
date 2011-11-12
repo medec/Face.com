@@ -1,7 +1,7 @@
 package example {
-	import facecom.api.events.FaceStatusEvent;
 	import facecom.api.FaceAPI;
-	import facecom.api.events.FaceEvent;
+	import facecom.api.events.FaceAPIEvent;
+
 	import flash.display.Sprite;
 	import flash.events.IOErrorEvent;
 
@@ -16,15 +16,16 @@ package example {
 		}
 
 		private function init() : void {
-			faceAPI = new FaceAPI('YOUR_API_KEY', 'YOUR_SECRET_CODE', 'YOUR_DEFAULT_NAMESPACE');
+			faceAPI = new FaceAPI('228f62cbac5d536b33318268c6f3bb7d', '848436c04c57ea431965f0a7a76557de');
+			
 			faceAPI.addEventListener(IOErrorEvent.IO_ERROR, faceAPIIOError);
-			faceAPI.addEventListener(FaceStatusEvent.STATUS, faceStatusHandler);
+			faceAPI.addEventListener(FaceAPIEvent.FACES_STATUS, faceStatusHandler);
 			
 			faceAPI.faces.status('all@testnamespace', 'testnamespace');
 		}
 
-		private function faceStatusHandler(event : FaceStatusEvent) : void {
-			trace(event.data);
+		private function faceStatusHandler(event : FaceAPIEvent) : void {
+			trace('status: ' + event.data);
 		}
 
 		private function faceAPIIOError(event : IOErrorEvent) : void {

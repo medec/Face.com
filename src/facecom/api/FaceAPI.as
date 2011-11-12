@@ -1,30 +1,35 @@
 package facecom.api {
-	import com.adobe.images.JPGEncoder;
-	import com.adobe.serialization.json.JSON;
-	import com.adobe.serialization.json.JSONDecoder;
-	import facecom.api.events.FaceEvent;
+	import facecom.api.events.FaceAPIEvent;
 	import facecom.api.events.FaceStatusEvent;
 	import facecom.api.model.core.Tag;
-	import facecom.api.model.results.AccountLimitsResult;
-	import facecom.api.model.results.RecognizeResult;
-	import facecom.api.model.results.StatusResult;
+	import facecom.api.model.results.FacesRecognizeResult;
+	import facecom.api.model.results.FacesStatusResult;
+	import facecom.api.model.results.FacesTrainResult;
 	import facecom.api.model.results.TagsSaveResult;
-	import facecom.api.model.results.TrainResult;
+	import facecom.api.proxy.AccountProxy;
 	import facecom.api.proxy.FacesProxy;
-	import flash.display.BitmapData;
+
+	import ru.inspirit.net.MultipartURLLoader;
+
+	import com.adobe.images.JPGEncoder;
+	import com.adobe.serialization.json.JSONDecoder;
+
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
-	import flash.utils.ByteArray;
-	import flash.utils.getTimer;
-	import ru.inspirit.net.MultipartURLLoader;
 
 
-
-
-
-
-	[Event(name="status", type="facecom.api.events.FaceStatusEvent")]
+	[Event(name="facesDetect", type="facecom.api.events.FaceAPIEvent")]
+	[Event(name="facesRecognize", type="facecom.api.events.FaceAPIEvent")]
+	[Event(name="facesGroup", type="facecom.api.events.FaceAPIEvent")]
+	[Event(name="facesTrain", type="facecom.api.events.FaceAPIEvent")]
+	[Event(name="facesStatus", type="facecom.api.events.FaceAPIEvent")]
+	[Event(name="tagsGet", type="facecom.api.events.FaceAPIEvent")]
+	[Event(name="tagsSave", type="facecom.api.events.FaceAPIEvent")]
+	[Event(name="facesRemove", type="facecom.api.events.FaceAPIEvent")]
+	[Event(name="accountUsers", type="facecom.api.events.FaceAPIEvent")]
+	[Event(name="accountLimits", type="facecom.api.events.FaceAPIEvent")]
+	[Event(name="accountNamespaces", type="facecom.api.events.FaceAPIEvent")]
 	
 	use namespace facecom;
 	/**
@@ -32,96 +37,39 @@ package facecom.api {
 	 */
 	public class FaceAPI extends EventDispatcher {
 		public static const API_DOMAIN : String = 'http://api.face.com/';
-		private var apiKey : String;
-		private var apiSecret : String;
-		private var jpgEncoder : JPGEncoder;
-		private var names : String;
-		private var debugTime : int;
-		private var _recognizeResult : RecognizeResult;
-		private var _statusResult : StatusResult;
-		private var saveUid : String;
-		private var _faces : FacesProxy;
+		facecom var apiKey : String;
+		facecom var apiSecret : String;
+		facecom var jpgEncoder : JPGEncoder;
 
-		public function FaceAPI(apiKey : String, apiSecret : String = '', names : String = '') {
+		private var debugTime : int;
+		private var _recognizeResult : FacesRecognizeResult;
+		private var _statusResult : FacesStatusResult;
+		private var saveUid : String;
+		
+		private var _faces : FacesProxy;
+		private var _account : AccountProxy;
+				
+		private var names : Object;
+
+		public function FaceAPI(apiKey : String, apiSecret : String = '') {
 			this.apiKey = apiKey;
 			this.apiSecret = apiSecret;
-			this.names = names;
 
 			_faces = new FacesProxy(this);
 
 			jpgEncoder = new JPGEncoder(40);
-
-			accountLimits();
 		}
 
-		private function createLoader() : MultipartURLLoader {
+		facecom function createLoader() : MultipartURLLoader {
 			var ml : MultipartURLLoader = new MultipartURLLoader();
 			ml.addVariable('api_key', apiKey);
 			ml.addVariable('api_secret', apiSecret ? apiSecret : '');
 
 			return ml;
 		}
-
-		public function recognize(photo : BitmapData) : void {
-			debugTime = getTimer();
-
-			var photoFile : ByteArray = jpgEncoder.encode(photo);
-
-			var ml : MultipartURLLoader = createLoader();
-
-			ml.addEventListener(Event.COMPLETE, recognizeCompleteHandler);
-			ml.addEventListener(IOErrorEvent.IO_ERROR, faceIOErrorHandler);
-			ml.addFile(photoFile, 'screenshot.jpg');
-
-			ml.addVariable('uids', 'all@' + names);
-			ml.addVariable('namespace', names);
-			ml.addVariable('detector', 'Aggressive');
-			ml.addVariable('attributes', 'all');
-
-			ml.load(API_DOMAIN + 'faces/recognize.json');
-		}
-
-		private function faceIOErrorHandler(event : IOErrorEvent) : void {
-			trace('blad polaczenia');
-		}
-
-		private function recognizeCompleteHandler(event : Event) : void {
-			trace('complete', (getTimer() - debugTime));
-			trace((event.currentTarget as MultipartURLLoader).loader.data);
-			var tmp : int = getTimer();
-
-			var result : RecognizeResult = new RecognizeResult(new JSONDecoder((event.currentTarget as MultipartURLLoader).loader.data, true).getValue());
-
-			if (result.photos[0].tags.length >= 1) {
-				trace('wykryto twarz');
-				_recognizeResult = result;
-				dispatchEvent(new FaceEvent(FaceEvent.FACE_RECOGNIZE));
-			} else {
-				dispatchEvent(new FaceEvent(FaceEvent.FACE_NOT_FOUND));
-			}
-
-			// trace(result.photos[0].tags[0].uids[0].uid);
-			// trace(result.photos[0].tags[0].uids[0].confidence);
-		}
-
-		facecom function accountLimits() : void {
-			debugTime = getTimer();
-
-			var ml : MultipartURLLoader = createLoader();
-			ml.addEventListener(Event.COMPLETE, accountLimitsCompleteHandler);
-			ml.addEventListener(IOErrorEvent.IO_ERROR, faceIOErrorHandler);
-
-			ml.load(API_DOMAIN + 'account/limits.json');
-		}
-
-		private function accountLimitsCompleteHandler(event : Event) : void {
-			var result : AccountLimitsResult = new AccountLimitsResult(new JSONDecoder((event.currentTarget as MultipartURLLoader).loader.data, true).getValue());
-
-			trace(result);
-		}
-
-		public function get recognizeResult() : RecognizeResult {
-			return _recognizeResult;
+		
+		facecom function getResultDataToObject(loader:MultipartURLLoader):Object {
+			return new JSONDecoder(loader.loader.data, true).getValue();
 		}
 
 		public function saveTag(userName : String, tag : Tag) : void {
@@ -155,10 +103,10 @@ package facecom.api {
 		}
 
 		private function tagTrainCompleteHandler(event : Event) : void {
-			var result : TrainResult = new TrainResult(new JSONDecoder((event.currentTarget as MultipartURLLoader).loader.data, true).getValue());
+			var result : FacesTrainResult = new FacesTrainResult(new JSONDecoder((event.currentTarget as MultipartURLLoader).loader.data, true).getValue());
 			trace('result: ' + (result));
 
-			dispatchEvent(new FaceEvent(FaceEvent.FACE_SAVE));
+			// FIXME: dispatchEvent(new FaceAPIEvent(FaceAPIEvent.FACE_SAVE));
 		}
 
 		facecom function facesStatus(uid:String = '', names:String = '') : void {
@@ -174,19 +122,27 @@ package facecom.api {
 		}
 
 		private function tagStatusCompleteHandler(event : Event) : void {
-			var result : StatusResult = new StatusResult(new JSONDecoder((event.currentTarget as MultipartURLLoader).loader.data, true).getValue());
+			var result : FacesStatusResult = new FacesStatusResult(new JSONDecoder((event.currentTarget as MultipartURLLoader).loader.data, true).getValue());
 
 			this._statusResult = result;
 
 			dispatchEvent(new FaceStatusEvent(FaceStatusEvent.STATUS, result));
 		}
 
-		public function get statusResult() : StatusResult {
+		public function get statusResult() : FacesStatusResult {
 			return _statusResult;
 		}
 
 		public function get faces() : FacesProxy {
 			return _faces;
+		}
+
+		public function get account() : AccountProxy {
+			return _account;
+		}
+
+		public function faceIOErrorHandler(event : IOErrorEvent) : void {
+			dispatchEvent(event);
 		}
 	}
 }

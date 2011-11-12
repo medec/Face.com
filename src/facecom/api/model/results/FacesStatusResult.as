@@ -3,11 +3,11 @@ package facecom.api.model.results {
 	/**
 	 * @author medec
 	 */
-	public class StatusResult extends Result {
+	public class FacesStatusResult extends Result {
 		
 		public var user_statuses : Vector.<User> = new Vector.<User>();
 
-		public function StatusResult(data: Object) {
+		public function FacesStatusResult(data: Object) {
 			super(data);
 			Result.arrayToVector(data['user_statuses'], user_statuses, User);
 		}

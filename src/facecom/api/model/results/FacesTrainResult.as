@@ -3,12 +3,12 @@ package facecom.api.model.results {
 	/**
 	 * @author medec
 	 */
-	public class TrainResult extends Result {
+	public class FacesTrainResult extends Result {
 		
 		public var unchanged : Vector.<User> = new Vector.<User>();
 		public var created : Vector.<User> = new Vector.<User>();
 
-		public function TrainResult(data : Object) {
+		public function FacesTrainResult(data : Object) {
 			super(data);
 			
 			Result.arrayToVector(data['unchanged'], unchanged, User);

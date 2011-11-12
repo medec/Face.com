@@ -4,13 +4,13 @@ package facecom.api.model.results {
 	/**
 	 * @author medec
 	 */
-	public class RecognizeResult extends Result {
+	public class FacesRecognizeResult extends Result {
 		
 		public var photos:Vector.<Photo> = new Vector.<Photo>();
 		
 		public var usage : Usage;
 
-		public function RecognizeResult(data : Object) {
+		public function FacesRecognizeResult(data : Object) {
 			
 			super(data);
 
