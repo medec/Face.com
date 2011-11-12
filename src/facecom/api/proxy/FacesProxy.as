@@ -4,6 +4,7 @@ package facecom.api.proxy {
 	import facecom.api.facecom;
 	import facecom.api.model.results.FacesRecognizeResult;
 	import facecom.api.model.results.FacesStatusResult;
+	import facecom.api.model.results.FacesTrainResult;
 
 	import ru.inspirit.net.MultipartURLLoader;
 
@@ -23,8 +24,6 @@ package facecom.api.proxy {
 		}
 		
 		public function recognize(photoURLs:Array = null, photo : BitmapData = null, uids:Array = null, names:String = '', detector:String = 'Aggressive', attributes:String = 'all') : void {
-			
-			
 			var ml : MultipartURLLoader = clientAPI.createLoader();
 
 			ml.addEventListener(Event.COMPLETE, recognizeCompleteHandler);
@@ -49,6 +48,27 @@ package facecom.api.proxy {
 			var result : FacesRecognizeResult = new FacesRecognizeResult(clientAPI.getResultDataToObject(event.currentTarget as MultipartURLLoader));
 			
 			clientAPI.dispatchEvent(new FaceAPIEvent(FaceAPIEvent.FACES_RECOGNIZE, result));
+		}
+		
+		/**
+		 * @param callback_url TODO
+		 */
+		public function train(uids:Array, names:String, callback_url:String = ''):void {
+			var ml : MultipartURLLoader = clientAPI.createLoader();
+			ml.addEventListener(Event.COMPLETE, tagTrainCompleteHandler);
+			ml.addEventListener(IOErrorEvent.IO_ERROR, clientAPI.faceIOErrorHandler);
+
+			
+			ml.addVariable('uids', uids.join(','));
+			ml.addVariable('namespace', names);
+			
+			ml.load(FaceAPI.API_DOMAIN + 'faces/train.json');
+		}
+
+		private function tagTrainCompleteHandler(event : Event) : void {
+			var result : FacesTrainResult = new FacesTrainResult(clientAPI.getResultDataToObject(event.currentTarget as MultipartURLLoader));
+			
+			clientAPI.dispatchEvent(new FaceAPIEvent(FaceAPIEvent.FACES_TRAIN, result));
 		}
 		
 		public function status(uid:String, names:String):void {

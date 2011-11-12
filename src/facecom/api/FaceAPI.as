@@ -1,4 +1,5 @@
 package facecom.api {
+	import facecom.api.proxy.TagsProxy;
 	import facecom.api.events.FaceStatusEvent;
 	import facecom.api.model.core.Tag;
 	import facecom.api.model.results.FacesRecognizeResult;
@@ -40,13 +41,9 @@ package facecom.api {
 		facecom var apiSecret : String;
 		facecom var jpgEncoder : JPGEncoder;
 
-		private var debugTime : int;
-		private var _recognizeResult : FacesRecognizeResult;
-		private var _statusResult : FacesStatusResult;
-		private var saveUid : String;
-		
 		private var _faces : FacesProxy;
 		private var _account : AccountProxy;
+		private var _tags:TagsProxy;
 				
 		private var names : Object;
 
@@ -57,6 +54,18 @@ package facecom.api {
 			_faces = new FacesProxy(this);
 
 			jpgEncoder = new JPGEncoder(40);
+		}
+
+		public function get faces() : FacesProxy {
+			return _faces;
+		}
+
+		public function get account() : AccountProxy {
+			return _account;
+		}
+
+		public function get tags() : TagsProxy {
+			return _tags;
 		}
 
 		facecom function createLoader() : MultipartURLLoader {
@@ -71,77 +80,9 @@ package facecom.api {
 			return new JSONDecoder(loader.loader.data, true).getValue();
 		}
 
-		public function saveTag(userName : String, tag : Tag) : void {
-			var ml : MultipartURLLoader = createLoader();
-			ml.addEventListener(Event.COMPLETE, tagSaveCompleteHandler);
-			ml.addEventListener(IOErrorEvent.IO_ERROR, faceIOErrorHandler);
-
-			ml.addVariable('tids', tag.tid);
-
-			saveUid = userName + '@' + names;
-			ml.addVariable('uid', saveUid);
-
-			ml.load(FaceAPI.API_DOMAIN + 'tags/save.json');
-		}
-
-		private function tagSaveCompleteHandler(event : Event) : void {
-			var result : TagsSaveResult = new TagsSaveResult(new JSONDecoder((event.currentTarget as MultipartURLLoader).loader.data, true).getValue());
-			trace('result: ' + (result));
-
-			var ml : MultipartURLLoader = createLoader();
-			ml.addEventListener(Event.COMPLETE, tagTrainCompleteHandler);
-			ml.addEventListener(IOErrorEvent.IO_ERROR, faceIOErrorHandler);
-
-			ml.addVariable('namespace', names);
-
-			ml.addVariable('uids', saveUid);
-
-			ml.load(FaceAPI.API_DOMAIN + 'faces/train.json');
-
-			// dispatchEvent(new FaceEvent(FaceEvent.FACE_SAVE));
-		}
-
-		private function tagTrainCompleteHandler(event : Event) : void {
-			var result : FacesTrainResult = new FacesTrainResult(new JSONDecoder((event.currentTarget as MultipartURLLoader).loader.data, true).getValue());
-			trace('result: ' + (result));
-
-			// FIXME: dispatchEvent(new FaceAPIEvent(FaceAPIEvent.FACE_SAVE));
-		}
-
-		facecom function facesStatus(uid:String = '', names:String = '') : void {
-			var ml : MultipartURLLoader = createLoader();
-			ml.addEventListener(Event.COMPLETE, tagStatusCompleteHandler);
-			ml.addEventListener(IOErrorEvent.IO_ERROR, faceIOErrorHandler);
-
-			//ml.addVariable('uids', 'all@' + names);
-			ml.addVariable('uids', uid);
-			ml.addVariable('namespace', names);
-
-			ml.load(FaceAPI.API_DOMAIN + 'faces/status.json');
-		}
-
-		private function tagStatusCompleteHandler(event : Event) : void {
-			var result : FacesStatusResult = new FacesStatusResult(new JSONDecoder((event.currentTarget as MultipartURLLoader).loader.data, true).getValue());
-
-			this._statusResult = result;
-
-			dispatchEvent(new FaceStatusEvent(FaceStatusEvent.STATUS, result));
-		}
-
-		public function get statusResult() : FacesStatusResult {
-			return _statusResult;
-		}
-
-		public function get faces() : FacesProxy {
-			return _faces;
-		}
-
-		public function get account() : AccountProxy {
-			return _account;
-		}
-
-		public function faceIOErrorHandler(event : IOErrorEvent) : void {
+		facecom function faceIOErrorHandler(event : IOErrorEvent) : void {
 			dispatchEvent(event);
 		}
+
 	}
 }
