@@ -1,4 +1,4 @@
-package facecom.api.model.events {
+package facecom.api.events {
 	import flash.events.Event;
 
 	/**
