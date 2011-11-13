@@ -1,4 +1,4 @@
-package facecom.api.model.core {
+package facecom.api.model.core.attributes {
 	/**
 	 * @author medec
 	 */
