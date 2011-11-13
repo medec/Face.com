@@ -1,38 +1,31 @@
-package example {
-	import flash.display.Bitmap;
+package examples {
 	import facecom.api.FaceAPI;
 	import facecom.api.events.FaceAPIEvent;
 
 	import flash.display.Sprite;
 	import flash.events.IOErrorEvent;
 
-
 	/**
 	 * @author medec
 	 */
-	public class FacesRecognizeBitmapDataExample extends Sprite {
+	public class FacesRecognizeURLsExample extends Sprite {
 		private var faceAPI : FaceAPI;
-		
-		[Embed(source="../assets/01.jpg")]
-		private var examplePhotoClass : Class;
 
-		public function FacesRecognizeBitmapDataExample() {
+		public function FacesRecognizeURLsExample() {
 			init();
 		}
 
 		private function init() : void {
 			faceAPI = new FaceAPI('228f62cbac5d536b33318268c6f3bb7d', '848436c04c57ea431965f0a7a76557de');
-			
+
 			faceAPI.addEventListener(IOErrorEvent.IO_ERROR, faceAPIIOError);
 			faceAPI.addEventListener(FaceAPIEvent.FACES_RECOGNIZE, faceRecognizeHandler);
-			
-			
-			testSendPhotoBitmapData();			
+
+			testSendPhotoURLs();
 		}
 
-		private function testSendPhotoBitmapData() : void {
-			var exampleBitmap:Bitmap = new examplePhotoClass() as Bitmap;
-			faceAPI.faces.recognize(null, exampleBitmap.bitmapData, ['all@testnamespace'], 'testnamespace');
+		private function testSendPhotoURLs() : void {
+			faceAPI.faces.recognize(['http://users.telenet.be/move/supporters.jpg'], null, ['all@testnamespace'], 'testnamespace');
 		}
 
 		private function faceRecognizeHandler(event : FaceAPIEvent) : void {

@@ -1,4 +1,4 @@
-package example {
+package examples {
 	import flash.display.Bitmap;
 	import facecom.api.FaceAPI;
 	import facecom.api.events.FaceAPIEvent;
