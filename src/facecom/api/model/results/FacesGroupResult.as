@@ -7,9 +7,9 @@ package facecom.api.model.results {
 	 */
 	public class FacesGroupResult extends Result {
 		
-		public var groups:Vector.<Group>;
+		public var groups:Vector.<Group> = new Vector.<Group>();
 		
-		public var photos : Vector.<Photo>;
+		public var photos : Vector.<Photo> = new Vector.<Photo>();
 		public var usage : Usage;
 
 		public function FacesGroupResult(data:Object) {

@@ -1,4 +1,5 @@
 package facecom.api.proxy {
+	import facecom.api.model.results.FacesGroupResult;
 	import facecom.api.model.results.FacesDetectResult;
 	import facecom.api.FaceAPI;
 	import facecom.api.events.FaceAPIEvent;
@@ -74,6 +75,34 @@ package facecom.api.proxy {
 			var result : FacesRecognizeResult = new FacesRecognizeResult(clientAPI.getResultDataToObject(event.currentTarget as MultipartURLLoader));
 			
 			clientAPI.dispatchEvent(new FaceAPIEvent(FaceAPIEvent.FACES_RECOGNIZE, result));
+		}
+		
+		public function group(photoURLs:Array = null, photo : BitmapData = null, uids:Array = null, names:String = '', detector:String = 'Aggressive', attributes:String = 'all', callback_url:String = null) : void {
+			var ml : MultipartURLLoader = clientAPI.createLoader();
+
+			ml.addEventListener(Event.COMPLETE, groupCompleteHandler);
+			ml.addEventListener(IOErrorEvent.IO_ERROR, clientAPI.faceIOErrorHandler);
+			if(photoURLs) {
+				ml.addVariable('urls', photoURLs.join(','));
+			}
+			else if(photo) {
+				var photoFile : ByteArray = clientAPI.jpgEncoder.encode(photo);
+				ml.addFile(photoFile, 'image.jpg');
+			}
+			
+			ml.addVariable('uids', uids.join(','));
+			ml.addVariable('namespace', names);
+			ml.addVariable('detector', detector);
+			ml.addVariable('attributes', attributes);
+
+			ml.load(FaceAPI.API_DOMAIN + 'faces/group.json');
+			
+		}
+
+		private function groupCompleteHandler(event : Event) : void {
+			var result : FacesGroupResult = new FacesGroupResult(clientAPI.getResultDataToObject(event.currentTarget as MultipartURLLoader));
+			
+			clientAPI.dispatchEvent(new FaceAPIEvent(FaceAPIEvent.FACES_GROUP, result));
 		}
 		
 		/**
