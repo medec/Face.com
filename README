@@ -1,11 +1,11 @@
-Unofficial Face.com API.
+Face.com REST API Actionscript 3 client library.
+
+For a demonstration how to use this library, see *.as files from directory src/examples/.
+
+
+For more information about the API and the return values, visit the official documentation:
+http://developers.face.com/docs/api/
+
 
 Important!
-The word "namespace" of the REST API is reserved in AS3 and there is everywhere in this library as the "names".
-
-AS3 examples:
-Read *.as files from directory src/examples/.
-
-
-Full REST API documentation:
-http://developers.face.com/docs/api/.
+The word "namespace" of the REST API is reserved in AS3. There is everywhere in this library as the "names".
