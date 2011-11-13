@@ -4,6 +4,12 @@ package facecom.api.model.results {
 	 * @author medec
 	 */
 	public class AccountUsersResult extends Result {
-		public var users:Dictionary;
+		public var users : Dictionary;
+
+		public function AccountUsersResult(data:Object) {
+			super(data);
+			
+			// TODO
+		}
 	}
 }

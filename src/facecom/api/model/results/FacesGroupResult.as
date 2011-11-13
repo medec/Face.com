@@ -5,11 +5,20 @@ package facecom.api.model.results {
 	/**
 	 * @author medec
 	 */
-	public class GroupResult extends Result {
+	public class FacesGroupResult extends Result {
 		
 		public var groups:Vector.<Group>;
 		
 		public var photos : Vector.<Photo>;
 		public var usage : Usage;
+
+		public function FacesGroupResult(data:Object) {
+			super(data);
+			
+			Result.arrayToVector(data['groups'], groups, Group);
+			Result.arrayToVector(data['photos'], photos, Photo);
+			
+			usage = new Usage(data['usage']);
+		}
 	}
 }
