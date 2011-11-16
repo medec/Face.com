@@ -1,9 +1,9 @@
 package facecom.api.proxy {
-	import facecom.api.model.results.FacesGroupResult;
-	import facecom.api.model.results.FacesDetectResult;
 	import facecom.api.FaceAPI;
 	import facecom.api.events.FaceAPIEvent;
 	import facecom.api.facecom;
+	import facecom.api.model.results.FacesDetectResult;
+	import facecom.api.model.results.FacesGroupResult;
 	import facecom.api.model.results.FacesRecognizeResult;
 	import facecom.api.model.results.FacesStatusResult;
 	import facecom.api.model.results.FacesTrainResult;
@@ -14,6 +14,7 @@ package facecom.api.proxy {
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.utils.ByteArray;
+	import flash.utils.getTimer;
 	/**
 	 * @author medec
 	 */
@@ -21,6 +22,7 @@ package facecom.api.proxy {
 	use namespace facecom;
 	 
 	public class FacesProxy extends Proxy {
+		
 		public function FacesProxy(clientAPI : FaceAPI) {
 			super(clientAPI);
 		}
@@ -34,7 +36,8 @@ package facecom.api.proxy {
 				ml.addVariable('urls', photoURLs.join(','));
 			}
 			else if(photo) {
-				var photoFile : ByteArray = clientAPI.jpgEncoder.encode(photo);
+				//var photoFile : ByteArray = clientAPI.jpgEncoder.encode(photo);
+				var photoFile:ByteArray = clientAPI.getJPEG(photo);
 				ml.addFile(photoFile, 'image.jpg');
 			}
 			
@@ -59,7 +62,10 @@ package facecom.api.proxy {
 				ml.addVariable('urls', photoURLs.join(','));
 			}
 			else if(photo) {
-				var photoFile : ByteArray = clientAPI.jpgEncoder.encode(photo);
+				var tmp:int = getTimer();
+				var photoFile:ByteArray = clientAPI.getJPEG(photo);
+								
+				
 				ml.addFile(photoFile, 'image.jpg');
 			}
 			
@@ -86,7 +92,7 @@ package facecom.api.proxy {
 				ml.addVariable('urls', photoURLs.join(','));
 			}
 			else if(photo) {
-				var photoFile : ByteArray = clientAPI.jpgEncoder.encode(photo);
+				var photoFile:ByteArray = clientAPI.getJPEG(photo);
 				ml.addFile(photoFile, 'image.jpg');
 			}
 			

@@ -1,23 +1,18 @@
 package facecom.api {
-	import facecom.api.proxy.TagsProxy;
-	import facecom.api.events.FaceStatusEvent;
-	import facecom.api.model.core.Tag;
-	import facecom.api.model.results.FacesRecognizeResult;
-	import facecom.api.model.results.FacesStatusResult;
-	import facecom.api.model.results.FacesTrainResult;
-	import facecom.api.model.results.TagsSaveResult;
+	import cmodule.aircall.CLibInit;
+
 	import facecom.api.proxy.AccountProxy;
 	import facecom.api.proxy.FacesProxy;
+	import facecom.api.proxy.TagsProxy;
 
 	import ru.inspirit.net.MultipartURLLoader;
 
-	import com.adobe.images.JPGEncoder;
 	import com.adobe.serialization.json.JSONDecoder;
 
-	import flash.events.Event;
+	import flash.display.BitmapData;
 	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
-
+	import flash.utils.ByteArray;
 
 	[Event(name="facesDetect", type="facecom.api.events.FaceAPIEvent")]
 	[Event(name="facesRecognize", type="facecom.api.events.FaceAPIEvent")]
@@ -30,7 +25,6 @@ package facecom.api {
 	[Event(name="accountUsers", type="facecom.api.events.FaceAPIEvent")]
 	[Event(name="accountLimits", type="facecom.api.events.FaceAPIEvent")]
 	[Event(name="accountNamespaces", type="facecom.api.events.FaceAPIEvent")]
-	
 	use namespace facecom;
 	/**
 	 * @author medec
@@ -39,12 +33,12 @@ package facecom.api {
 		public static const API_DOMAIN : String = 'http://api.face.com/';
 		facecom var apiKey : String;
 		facecom var apiSecret : String;
-		facecom var jpgEncoder : JPGEncoder;
-
 		private var _faces : FacesProxy;
 		private var _account : AccountProxy;
-		private var _tags:TagsProxy;
-		
+		private var _tags : TagsProxy;
+		facecom var jpeglib : Object;
+		private var jpeginit : CLibInit = new CLibInit();
+
 		public function FaceAPI(apiKey : String, apiSecret : String = '') {
 			this.apiKey = apiKey;
 			this.apiSecret = apiSecret;
@@ -53,7 +47,22 @@ package facecom.api {
 			_account = new AccountProxy(this);
 			_tags = new TagsProxy(this);
 
-			jpgEncoder = new JPGEncoder(40);
+			if (!jpeglib) {
+				jpeglib = jpeginit.init();
+			}
+		}
+
+		facecom function getJPEG(photo : BitmapData) : ByteArray {
+			var photoFile : ByteArray = new ByteArray();
+			photoFile.position = 0;
+
+			var imgData : ByteArray = photo.getPixels(photo.rect);
+
+			jpeglib.encode(imgData, photoFile, photo.width, photo.height, 40);
+			
+			photoFile.position = 0;
+
+			return photoFile;
 		}
 
 		public function get faces() : FacesProxy {
@@ -75,14 +84,13 @@ package facecom.api {
 
 			return ml;
 		}
-		
-		facecom function getResultDataToObject(loader:MultipartURLLoader):Object {
+
+		facecom function getResultDataToObject(loader : MultipartURLLoader) : Object {
 			return new JSONDecoder(loader.loader.data, true).getValue();
 		}
 
 		facecom function faceIOErrorHandler(event : IOErrorEvent) : void {
 			dispatchEvent(event);
 		}
-
 	}
 }
