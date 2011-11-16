@@ -9,9 +9,9 @@ package examples {
 	/**
 	 * @author medec
 	 */
-	public class AccountStatusExample extends Sprite {
+	public class FacesStatusExample extends Sprite {
 		private var faceAPI : FaceAPI;
-		public function AccountStatusExample() {
+		public function FacesStatusExample() {
 			init();
 		}
 

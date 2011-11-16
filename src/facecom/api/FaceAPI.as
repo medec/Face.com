@@ -44,14 +44,14 @@ package facecom.api {
 		private var _faces : FacesProxy;
 		private var _account : AccountProxy;
 		private var _tags:TagsProxy;
-				
-		private var names : Object;
-
+		
 		public function FaceAPI(apiKey : String, apiSecret : String = '') {
 			this.apiKey = apiKey;
 			this.apiSecret = apiSecret;
 
 			_faces = new FacesProxy(this);
+			_account = new AccountProxy(this);
+			_tags = new TagsProxy(this);
 
 			jpgEncoder = new JPGEncoder(40);
 		}
