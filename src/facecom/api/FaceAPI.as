@@ -52,13 +52,13 @@ package facecom.api {
 			}
 		}
 
-		facecom function getJPEG(photo : BitmapData) : ByteArray {
+		facecom function getJPEG(photo : BitmapData, callback:Function, callbackLoader:MultipartURLLoader) : ByteArray {
 			var photoFile : ByteArray = new ByteArray();
 			photoFile.position = 0;
 
 			var imgData : ByteArray = photo.getPixels(photo.rect);
-
-			jpeglib.encode(imgData, photoFile, photo.width, photo.height, 40);
+			
+			jpeglib.encodeAsync(function ():void {callbackLoader.addFile(photoFile, 'image.jpg');	callback(callbackLoader); }, imgData, photoFile, photo.width, photo.height, 40);
 			
 			photoFile.position = 0;
 
