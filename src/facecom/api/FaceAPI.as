@@ -30,7 +30,7 @@ package facecom.api {
 	 * @author medec
 	 */
 	public class FaceAPI extends EventDispatcher {
-		public static const API_DOMAIN : String = 'http://api.face.com/';
+		public static const API_DOMAIN : String = 'https://api.skybiometry.com/fc/';
 		facecom var apiKey : String;
 		facecom var apiSecret : String;
 		private var _faces : FacesProxy;
