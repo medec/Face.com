@@ -58,9 +58,9 @@ package facecom.api.model.core {
 			center = new Point(data['center']['x'], data['center']['y']);
 			eye_left = new Point(data['eye_left']['x'], data['eye_left']['y']);
 			eye_right = new Point(data['eye_right']['x'], data['eye_right']['y']);
-			mouth_left = new Point(data['mouth_left']['x'], data['mouth_left']['y']);
+			//mouth_left = new Point(data['mouth_left']['x'], data['mouth_left']['y']);
 			mouth_center = new Point(data['mouth_center']['x'], data['mouth_center']['y']);
-			mouth_right = new Point(data['mouth_right']['x'], data['mouth_right']['y']);
+			//mouth_right = new Point(data['mouth_right']['x'], data['mouth_right']['y']);
 			nose = new Point(data['nose']['x'], data['nose']['y']);
 			
 			ear_left = data['ear_left'];

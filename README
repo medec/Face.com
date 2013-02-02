@@ -1,10 +1,10 @@
-Face.com REST API Actionscript 3 client library.
+SkyBiometry Face Detection and Recognition API Actionscript 3 client library.
 
 For a demonstration how to use this library, see *.as files from directory src/examples/.
 
 
 For more information about the API and the return values, visit the official documentation:
-http://developers.face.com/docs/api/
+http://www.skybiometry.com/Documentation
 
 
 Important!
